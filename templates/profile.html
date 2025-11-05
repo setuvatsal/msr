@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Profile - Music Recommendation System{% endblock %}
+{% block content %}
+  <section class="card">
+    <h2>Your profile</h2>
+    <form method="post" class="profile-form">
+      <label>Name
+        <input name="name" value="{{ user.name }}">
+      </label>
+      <label>Email
+        <input name="email" type="email" value="{{ user.email }}">
+      </label>
+      <label>Bio
+        <textarea name="bio">{{ user.bio }}</textarea>
+      </label>
+
+      <fieldset>
+        <legend>Favorite genres</legend>
+        <div class="checkbox-grid">
+          {% for g in genres %}
+            <label><input type="checkbox" name="genres" value="{{ g }}" {% if g in user.favorite_genres %}checked{% endif %}> {{ g }}</label>
+          {% endfor %}
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Favorite moods</legend>
+        <div class="checkbox-grid">
+          {% for m in moods %}
+            <label><input type="checkbox" name="moods" value="{{ m }}" {% if m in user.favorite_moods %}checked{% endif %}> {{ m }}</label>
+          {% endfor %}
+        </div>
+      </fieldset>
+
+      <div class="form-actions">
+        <button class="btn-primary" type="submit">Save profile</button>
+      </div>
+    </form>
+  </section>
+{% endblock %}

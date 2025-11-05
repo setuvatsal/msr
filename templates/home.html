@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block title %}Home - Music Recommendation System{% endblock %}
+{% block content %}
+  <section class="hero">
+    <div class="hero-inner">
+      <div>
+        <h1>Welcome back, {{ user.name if user and user.name else 'Listener' }} 👋</h1>
+        <p class="muted">Discover music by mood, genre, or what's trending.</p>
+        <form class="hero-search" method="get" action="{{ request.url_for('recommendations') }}">
+          <input name="q" placeholder="Search songs, artists, or moods" aria-label="Search songs or artists">
+          <button class="btn-primary" type="submit">Search</button>
+        </form>
+
+        <div class="quick-actions" aria-hidden="false">
+          <button class="btn-ghost" onclick="location.href='{{ request.url_for('recommendations') }}?mood=Happy'">Happy mixes</button>
+          <button class="btn-ghost" onclick="location.href='{{ request.url_for('recommendations') }}?mood=Energetic'">Energetic mixes</button>
+          <button class="btn-ghost" onclick="location.href='{{ request.url_for('recommendations') }}?q=Top'">Top charts</button>
+        </div>
+      </div>
+      <div class="hero-cta">
+        <a class="btn-ghost" href="{{ request.url_for('profile') }}">Edit Profile</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="card section-trending">
+    <div class="section-header"><h3>Trending now</h3><div class="section-sub muted">What everyone's listening to</div></div>
+    <div class="trending-row" role="list">
+      {% for s in popular[:18] %}
+        <div class="trending-card" role="listitem">
+          <div class="cover-wrap">
+            <img class="cover" src="/static/cover-placeholder.svg" alt="cover">
+            <button class="play-overlay" data-song-id="{{ s.id }}" data-preview="{{ s.preview }}" data-title="{{ s.title }}" data-artist="{{ s.artist }}" aria-label="Play {{ s.title }}">▶</button>
+          </div>
+          <div class="tmeta">
+            <div class="song-title">{{ s.title }}</div>
+            <div class="song-meta muted">{{ s.artist }}</div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="grid">
+    <div class="col-main">
+      <h3>Mood playlists</h3>
+      <div class="mood-grid">
+        {% for mood in moods %}
+          <a class="mood-tile" href="{{ request.url_for('recommendations') }}?mood={{ mood }}"> 
+            <div class="mood-name">{{ mood }}</div>
+            <div class="mood-count">{{ (mood_playlists[mood]|length) if mood in mood_playlists else 0 }} songs</div>
+          </a>
+        {% endfor %}
+      </div>
+
+      <h3 class="section-heading">For you</h3>
+      <div class="for-you-row card-row">
+        {% for s in for_you %}
+          <article class="song-card">
+            <img class="cover" src="/static/cover-placeholder.svg" alt="cover">
+            <div class="song-title">{{ s.title }}</div>
+            <div class="song-meta">{{ s.artist }}</div>
+            <div class="card-actions">
+              <button class="btn-primary" data-song-id="{{ s.id }}" data-preview="{{ s.preview }}" data-title="{{ s.title }}" data-artist="{{ s.artist }}">Play</button>
+              <button class="btn-ghost" data-action="like" aria-pressed="false">♡</button>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+
+      <h3 class="section-heading">Selected playlists</h3>
+      {% for mood, songs in mood_playlists.items() %}
+        <div class="mood-block">
+          <h4>{{ mood }}</h4>
+          <div class="card-row">
+            {% for s in songs[:8] %}
+              <article class="song-card">
+                <img class="cover" src="/static/cover-placeholder.svg" alt="cover">
+                <div class="song-title">{{ s.title }}</div>
+                <div class="song-meta">{{ s.artist }} • {{ s.genre }}</div>
+                <div class="card-actions">
+                  <button class="btn-primary" data-song-id="{{ s.id }}" data-preview="{{ s.preview }}" data-title="{{ s.title }}" data-artist="{{ s.artist }}">Play</button>
+                </div>
+              </article>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <aside class="col-side">
+      <div class="panel">
+        <h4>Popular right now</h4>
+        <ol class="compact-list">
+          {% for s in popular %}
+            <li><a href="{{ request.url_for('recommendations') }}?q={{ s.title|urlencode }}">{{ s.title }}</a> — <span class="muted">{{ s.artist }}</span></li>
+          {% endfor %}
+        </ol>
+      </div>
+
+      <div class="panel">
+        <h4>Recent releases</h4>
+        <ol class="compact-list">
+          {% for s in recent %}
+            <li>{{ s.title }} — <span class="muted">{{ s.year }}</span></li>
+          {% endfor %}
+        </ol>
+      </div>
+    </aside>
+  </section>
+{% endblock %}

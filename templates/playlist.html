@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Playlist - Music Recommendation System{% endblock %}
+{% block content %}
+  <section class="card">
+    <h2>{{ mood }} playlist</h2>
+    <ol class="playlist-list">
+      {% for s in songs %}
+        <li>
+          <img class="cover" src="/static/cover-placeholder.svg" alt="cover">
+          <div>
+            <div class="song-title">{{ s.title }}</div>
+            <div class="song-meta">{{ s.artist }} • {{ s.album }} • {{ s.duration }}</div>
+            <div class="card-actions">
+              <button class="btn-primary" data-song-id="{{ s.id }}" data-preview="{{ s.preview }}" data-title="{{ s.title }}" data-artist="{{ s.artist }}">Play</button>
+            </div>
+          </div>
+        </li>
+      {% endfor %}
+    </ol>
+  </section>
+{% endblock %}

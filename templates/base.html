@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Music Recommendation System{% endblock %}</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+  <a class="brand" href="{{ request.url_for('home') }}">Music Recommendation System</a>
+      <nav class="main-nav">
+        {% if request.session.get('user_id') %}
+          <a href="{{ request.url_for('home') }}">Home</a>
+          <a href="{{ request.url_for('recommendations') }}">Recommendations</a>
+          <a href="{{ request.url_for('profile') }}">Profile</a>
+          <a href="{{ request.url_for('logout') }}">Logout</a>
+        {% else %}
+          <a href="{{ request.url_for('login') }}">Login</a>
+          <a href="{{ request.url_for('register') }}">Register</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+  <div class="container">© {{ current_year if current_year is defined else "" }} Music Recommendation System — built for demo</div>
+  </footer>
+
+  <!-- Sticky mini-player (controlled with JS) -->
+  <div id="mini-player" class="mini-player" aria-hidden="true">
+    <div class="mini-player-inner container">
+      <div class="mini-cover" id="mini-cover"></div>
+      <div class="mini-meta">
+        <div id="mini-title" class="mini-title">No song playing</div>
+        <div id="mini-artist" class="mini-artist muted">—</div>
+      </div>
+      <audio id="mini-audio" preload="none"></audio>
+      <div class="mini-controls">
+        <button id="mini-play" class="btn-primary">Play</button>
+        <a id="mini-open" class="link-button" href="#">Open</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js" defer></script>
+</body>
+</html>

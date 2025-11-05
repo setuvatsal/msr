@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}{{ song.title }} - Music Recommendation System{% endblock %}
+{% block content %}
+  <section class="card song-page">
+    <div class="song-header">
+      <img class="cover" src="/static/cover-placeholder.svg" alt="cover">
+      <div class="song-info">
+        <h2>{{ song.title }}</h2>
+        <div class="song-meta">{{ song.artist }} • {{ song.album }} • {{ song.year }}</div>
+        <div class="song-meta">Genre: {{ song.genre }} • Mood: {{ song.mood }}</div>
+        <div class="song-meta">Plays: {{ song.plays }}</div>
+
+        <div class="player">
+          <audio controls preload="metadata">
+            {% if song.preview %}
+              <source src="{{ song.preview }}" type="audio/wav">
+            {% else %}
+              <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+            {% endif %}
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+      </div>
+    </div>
+
+    <section class="related">
+      <h3>More like this</h3>
+      <div class="card-row">
+        {% for s in recs %}
+          <article class="song-card">
+            <img class="cover" src="/static/cover-placeholder.svg" alt="cover">
+            <div class="song-title">{{ s.title }}</div>
+            <div class="song-meta">{{ s.artist }} • {{ s.genre }}</div>
+            <div class="card-actions"><a class="btn-primary" href="{{ request.url_for('song', song_id=s.id) }}">Play</a></div>
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+  </section>
+{% endblock %}

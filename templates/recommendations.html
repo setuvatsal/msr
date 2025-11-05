@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Recommendations - Music Recommendation System{% endblock %}
+{% block content %}
+  <section class="card">
+    <h2>Recommendations</h2>
+    <form method="get" class="filter-form">
+      <div class="filter-row">
+        <label>Search
+          <input type="search" name="q" value="{{ q }}" placeholder="Title or artist">
+        </label>
+
+        <label>Filter by mood
+          <select name="mood">
+            <option value="">Any</option>
+            {% for m in all_moods %}
+              <option value="{{ m }}" {% if m==mood %}selected{% endif %}>{{ m }}</option>
+            {% endfor %}
+          </select>
+        </label>
+
+        <label>Filter by genre
+          <select name="genre">
+            <option value="">Any</option>
+            {% for g in all_genres %}
+              <option value="{{ g }}" {% if g==genre %}selected{% endif %}>{{ g }}</option>
+            {% endfor %}
+          </select>
+        </label>
+
+        <div class="form-actions">
+          <button class="btn-primary" type="submit">Apply</button>
+          <a class="btn-ghost" href="{{ request.url_for('recommendations') }}">Clear</a>
+        </div>
+      </div>
+    </form>
+
+    <div class="filter-summary">
+      {% set applied = [] %}
+      {% if q %}{% set _ = applied.append('search: "' ~ q ~ '"') %}{% endif %}
+      {% if mood %}{% set _ = applied.append('mood: ' ~ mood) %}{% endif %}
+      {% if genre %}{% set _ = applied.append('genre: ' ~ genre) %}{% endif %}
+      <div class="muted">{{ applied|length }} filters applied{% if applied %}: {{ applied|join(', ') }}{% endif %}</div>
+    </div>
+
+    <div class="card-row">
+      {% for s in songs %}
+        <article class="song-card large">
+          <img class="cover" src="/static/cover-placeholder.svg" alt="cover">
+          <div class="song-title">{{ s.title }}</div>
+          <div class="song-meta">{{ s.artist }} • {{ s.genre }} • {{ s.mood }}</div>
+          <div class="card-actions">
+            <button class="btn-primary" data-song-id="{{ s.id }}" data-preview="{{ s.preview }}" data-title="{{ s.title }}" data-artist="{{ s.artist }}">Play</button>
+            <a class="btn-ghost" href="{{ request.url_for('playlist', mood=s.mood) }}">Play mood</a>
+          </div>
+        </article>
+      {% endfor %}
+      {% if not songs %}
+        <p class="muted">No recommendations found for those filters.</p>
+      {% endif %}
+    </div>
+  </section>
+{% endblock %}

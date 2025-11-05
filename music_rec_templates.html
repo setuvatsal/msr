@@ -1,0 +1,188 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Music Recommendation System{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    {% if session.user_id %}
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-music"></i>
+            <h1>Music Rec System</h1>
+        </div>
+        <nav>
+            <a href="{{ url_for('home') }}" class="nav-item {% if request.endpoint == 'home' %}active{% endif %}">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="{{ url_for('recommendations') }}" class="nav-item {% if request.endpoint == 'recommendations' %}active{% endif %}">
+                <i class="fas fa-compass"></i> Discover
+            </a>
+            <a href="{{ url_for('profile') }}" class="nav-item {% if request.endpoint == 'profile' %}active{% endif %}">
+                <i class="fas fa-user"></i> Profile
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="main-content {% if not session.user_id %}full-width{% endif %}">
+        {% block content %}{% endblock %}
+    </div>
+    
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
+
+<!-- templates/login.html -->
+{% extends "base.html" %}
+{% block title %}Login - Music Recommendation System{% endblock %}
+{% block content %}
+<div class="auth-container">
+    <div class="auth-box">
+        <div class="auth-logo">
+            <i class="fas fa-music"></i>
+            <h1>Music Recommendation System</h1>
+        </div>
+        <h2>Login to Your Account</h2>
+        {% if error %}
+        <div class="error-message">{{ error }}</div>
+        {% endif %}
+        <form method="POST" class="auth-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn-primary">Login</button>
+        </form>
+        <p class="auth-link">Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+    </div>
+</div>
+{% endblock %}
+
+<!-- templates/register.html -->
+{% extends "base.html" %}
+{% block title %}Register - Music Recommendation System{% endblock %}
+{% block content %}
+<div class="auth-container">
+    <div class="auth-box">
+        <div class="auth-logo">
+            <i class="fas fa-music"></i>
+            <h1>Music Recommendation System</h1>
+        </div>
+        <h2>Create Your Account</h2>
+        {% if error %}
+        <div class="error-message">{{ error }}</div>
+        {% endif %}
+        <form method="POST" class="auth-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn-primary">Register</button>
+        </form>
+        <p class="auth-link">Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+    </div>
+</div>
+{% endblock %}
+
+<!-- templates/home.html -->
+{% extends "base.html" %}
+{% block title %}Home - Music Recommendation System{% endblock %}
+{% block content %}
+<div class="content-wrapper">
+    <header class="page-header">
+        <h1>Welcome back, {{ user.name }}!</h1>
+        <p class="subtitle">Discover music that matches your mood</p>
+    </header>
+    
+    <section class="mood-section">
+        <h2>Browse by Mood</h2>
+        <div class="mood-grid">
+            {% for mood in moods %}
+            <a href="{{ url_for('playlist', mood=mood) }}" class="mood-card">
+                <div class="mood-icon">
+                    {% if mood == 'Happy' %}
+                        <i class="fas fa-smile"></i>
+                    {% elif mood == 'Sad' %}
+                        <i class="fas fa-sad-tear"></i>
+                    {% elif mood == 'Energetic' %}
+                        <i class="fas fa-bolt"></i>
+                    {% elif mood == 'Calm' %}
+                        <i class="fas fa-spa"></i>
+                    {% elif mood == 'Romantic' %}
+                        <i class="fas fa-heart"></i>
+                    {% elif mood == 'Emotional' %}
+                        <i class="fas fa-heart-broken"></i>
+                    {% elif mood == 'Party' %}
+                        <i class="fas fa-glass-cheers"></i>
+                    {% else %}
+                        <i class="fas fa-cloud"></i>
+                    {% endif %}
+                </div>
+                <h3>{{ mood }}</h3>
+                <p>{{ mood_playlists[mood]|length }} songs</p>
+            </a>
+            {% endfor %}
+        </div>
+    </section>
+    
+    <section class="playlist-section">
+        <h2>Popular Right Now</h2>
+        <div class="song-list">
+            {% for song in popular[:10] %}
+            <div class="song-item">
+                <div class="song-number">{{ loop.index }}</div>
+                <div class="song-cover">
+                    <i class="fas fa-music"></i>
+                </div>
+                <div class="song-info">
+                    <div class="song-title">{{ song.title }}</div>
+                    <div class="song-artist">{{ song.artist }}</div>
+                </div>
+                <div class="song-genre">{{ song.genre }}</div>
+                <div class="song-duration">{{ song.duration }}</div>
+                <button class="play-btn"><i class="fas fa-play"></i></button>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    
+    <section class="playlist-section">
+        <h2>Recently Added</h2>
+        <div class="song-grid">
+            {% for song in recent[:6] %}
+            <div class="song-card">
+                <div class="song-card-cover">
+                    <i class="fas fa-compact-disc"></i>
+                    <button class="play-overlay"><i class="fas fa-play-circle"></i></button>
+                </div>
+                <h4>{{ song.title }}</h4>
+                <p>{{ song.artist }}</p>
+                <span class="song-badge">{{ song.mood }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% endblock %}
